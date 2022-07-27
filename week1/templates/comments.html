@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+            crossorigin="anonymous"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 1140px;
+        }
+
+        .poster-box {
+            margin: 30px auto;
+            width: 100%;
+            height: 400px;
+            border: 1px solid cadetblue;
+            box-shadow: 1px 1px 1px 1px rgb(197, 229, 229);
+            display: flex;
+
+        }
+
+        .box-box {
+            width: 40%;
+            height: 100%;
+            /* border: 1px solid black; */
+            padding: 2rem;
+        }
+
+
+        .figure {
+            margin: 0 auto;
+            width: 300px;
+            height: 300px;
+        }
+
+        .poster-info {
+            width: 60%;
+        }
+
+        .up {
+            font-family: 'Roboto', sans-serif;
+            height: 50%;
+            padding: 10px;
+        }
+
+        .down {
+            font-family: 'Roboto', sans-serif;
+            height: 50%;
+            padding: 10px;
+        }
+
+        .pagebar {
+            margin: 0 auto;
+        }
+
+        #aaa {
+            display: none;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            show_comment();
+        });
+
+
+        function show_comment() {
+            let id = $('#aaa').text()
+            $.ajax({
+                type: 'POST',
+                url: '/review2',
+                data: {'id': id},
+                success: function (response) {
+                    let rows = response['comment']
+                    console.log(rows)
+                    for (let i = 0; i < rows.length; i++) {
+                        let writter = rows[i]['writter']
+                        let comment = rows[i]['comment']
+
+                        let temp_html = `<tr>
+                                                <th scope="row">${writter}</th>
+                                                <td colspan="2">${comment}</td>
+                                            </tr>`
+                        $('#addhere').append(temp_html)
+                    }
+                }
+            });
+        }
+
+        function save_comment() {
+            let login_id = $.cookie('loginID')
+            let id = $('#aaa').text()
+            console.log(id)
+            let rvcomment = $('#rvcomment').val()
+            if (rvcomment == "") {
+                alert("리뷰를 등록해주세요")
+                return
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '/review',
+                    data: {'rvcomment_give': rvcomment, 'id': id, 'login_id': login_id},
+                    success: function (response) {
+                        console.log(rvcomment)
+                        alert(response['msg'])
+                        window.location.reload()
+                    }
+                })
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <main class="main">
+        <div class="poster-box">
+            <div class="box-box">
+                <div class="figure">
+                    {% set url = data.get('main_img') %}
+                    <img src="{{url}}" class="img rounded" alt="...">
+                </div>
+            </div>
+            <div class="posterInfo">
+                {% if data.get('program') == '' %}
+                <div class="up">
+                    <p class="text-md-start">{{data.get('title')}}</p>
+                </div>
+                <div class="down">
+                    <p class="text-sm-start down">{{data.get('use_trgt')}}</p>
+                </div>
+                {% else %}
+                <div class="up">
+                    <p class="text-md-start">{{data.get('program')}}</p>
+                </div>
+                <div class="down">
+                    <p class="text-sm-start down">{{data.get('use_trgt')}}</p>
+                </div>
+                {% endif %}
+                <p id="aaa">{{id}}</p>
+            </div>
+        </div>
+        <div class="review-post">
+            <div class="input-group mb-3">
+                <input id="rvcomment" type="text" class="form-control" aria-label="Recipient's username"
+                       aria-describedby="button-addon2">
+                <button onclick="save_comment()" class="btn btn-outline-secondary" type="button" id="button-addon2">리뷰
+                    등록
+                </button>
+                <button onclick="history.back()" class="btn btn-outline-secondary" type="button">뒤로가기</button>
+            </div>
+        </div>
+    </main>
+    <footer class="footer">
+        <div class="comment-box">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">작성자</th>
+                    <th scope="col">리뷰</th>
+                </tr>
+                </thead>
+                <tbody id="addhere">
+
+                </tbody>
+            </table>
+        </div>
+
+        <!--<div class="pagebar">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>-->
+    </footer>
+</div>
+
+<div>
+
+</div>
+</body>
+</html>

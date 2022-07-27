@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+            crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+    <meta charset="UTF-8">
+    <title>서울시 문화 공연 정보</title>
+
+    <style>
+        * {
+            margin: 0 auto;
+            padding: 0;
+            box-sizing: border-box;
+
+        }
+
+        .wrap {
+            width: 100%;
+            height: 200vh;
+            position: absolute;
+        }
+
+        .button {
+            float: right;
+
+        }
+
+        .banner {
+            width: 100%;
+            height: 40vh;
+            background-image: url("https://www.daejeon.go.kr/djac/images/djac/contents/visual_s01.jpg");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        .select_bar {
+            margin-top: 2.5vh;
+            width: 52%;
+        }
+
+        .select_bar > select {
+            width: 30%;
+            height: 40px;
+            float: left;
+            text-align: center;
+            margin-right: 1%;
+        }
+
+        .post_box {
+            width: 80%;
+            margin-top: 8vh;
+            margin-bottom: 3vh;
+        }
+
+        .card {
+            width: 60%;
+            height: 100%;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        .card img {
+            transition: all 0.2s linear;
+            width: 100%;
+
+        }
+        .card img:hover {
+            transform: scale(0.91);
+            cursor: pointer;
+        }
+        .card-title {
+            text-align: center;
+        }
+        #page-box {
+            width: 25%;
+        }
+
+
+    </style>
+    <script>
+        $(document).ready(function () {
+            showAll(1);
+        });
+
+        function search_fuc() {
+
+            let select_codename = $("#select_codename option:selected").val()
+            let select_guname = $("#select_guname option:selected").val()
+
+            if (select_codename == "" && select_guname == "") {
+                alert("검색 조건을 선택해주세요")
+            } else {
+                $('#post_box').empty()
+                $.ajax({
+                    type: "POST",
+                    url: "/search",
+                    data: {"codename_give": select_codename, "guname_give": select_guname},
+                    success: function (response) {
+
+                        let result = response["search_result"]
+                        if (result == "") {
+                            alert("조건에 맞는 공연이 없습니다")
+                            window.location.href = '/'
+                            // console.log(result)
+                        } else {
+                            for (let i = 0; i < result.length; i++) {
+                                let main_img = result[i]['main_img']
+                                let title = result[i]['title']
+                                let id = result[i]['_id']
+
+                                let temp_html = `<div class="col">
+                                            <div class="card"">
+                                                <a href="/comments?id=${id}">
+                                                <img src="${main_img}"
+                                                     class="card-img-top"  alt="..."></a>
+                                                <div class="card-body">
+                                                    <h6 class="card-title" id="card_title">${title}</h6>
+                                                </div>
+                                            </div>
+                                        </div>`
+                                $('#post_box').append(temp_html)
+
+                            }
+                        }
+
+                    }
+                })
+            }
+        }
+
+        function showAll(num) {
+            $(document).scrollTop(0)
+            $('#post_box').empty()
+            $.ajax({
+                type: "GET",
+                url: "/show",
+                data: {},
+                success: function (response) {
+                    let k = num -1
+                    let result = response["show_result"].slice(25 * k, 25 * k + 25)
+
+                    for (let i = 0; i < result.length; i++) {
+                        let main_img = result[i]['main_img']
+                        let title = result[i]['title']
+                        let id = result[i]['_id']
+
+                        let temp_html = `<div class="col">
+                                            <div class="card"">
+                                                <a href="/comments?id=${id}">
+                                                <img src="${main_img}"
+                                                     class="card-img-top" id="card_image" alt="..."})"></a>
+                                                <div class="card-body">
+                                                    <h6 class="card-title" id="card_title">${title}</h6>
+                                                </div>
+                                            </div>
+                                        </div>`
+                        $('#post_box').append(temp_html)
+                    }
+                }
+            })
+        }
+
+        function logout() {
+            $.removeCookie('mytoken', {path:'/'})
+            $.removeCookie('loginID', {path:'/'})
+            window.location.href='/login'
+        }
+    </script>
+</head>
+<body>
+<div class="wrap">
+    <div class="banner"></div>
+    <div class="select_bar">
+
+        <select class="form-select form-select-sm" aria-label=".form-select-sm example" id="select_codename">
+            <option selected value="">장르 선택</option>
+            <option value="클래식">클래식</option>
+            <option value="콘서트">콘서트</option>
+            <option value="축제-문화/예술">축제-문화/예술</option>
+            <option value="뮤지컬/오페라">뮤지컬/오페라</option>
+            <option value="전시/미술">전시/미술</option>
+            <option value="문화교양/강좌">문화교양/강좌</option>
+            <option value="국악">국악</option>
+            <option value="기타">기타</option>
+        </select>
+        <select class="form-select form-select-sm" aria-label=".form-select-sm example" id="select_guname">
+            <option value="">지역 선택</option>
+            <option value="강남구">강남구</option>
+            <option value="관악구">관악구</option>
+            <option value="광진구">광진구</option>
+            <option value="구로구">구로구</option>
+            <option value="금천구">금천구</option>
+            <option value="노원구">노원구</option>
+            <option value="도봉구">도봉구</option>
+            <option value="동대문구">동대문구</option>
+            <option value="동작구">동작구</option>
+            <option value="마포구">마포구</option>
+            <option value="서대문구">서대문구</option>
+            <option value="서초구">서초구</option>
+            <option value="성동구">성동구</option>
+            <option value="성북구">성북구</option>
+            <option value="송파구">송파구</option>
+            <option value="양천구">양천구</option>
+            <option value="영등포구">영등포구</option>
+            <option value="용산구">용산구</option>
+            <option value="은평구">은평구</option>
+            <option value="종로구">종로구</option>
+            <option value="중구">중구</option>
+            <option value="중랑구">중랑구</option>
+        </select>
+        <button type="button" class="btn btn-outline-secondary" onclick="search_fuc()">검색</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='/'">메인으로</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="logout()">로그아웃</button>
+    </div>
+    <div class="post_box">
+        <div class="row row-cols-1 row-cols-md-3 g-4" id="post_box">
+
+        </div>
+    </div>
+    <div id="page-box">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link" href="javascript:showAll(1)">First</a></li>
+                <li class="page-item"><a class="page-link" href="javascript:showAll(1)">1</a></li>
+                <li class="page-item"><a class="page-link" href="javascript:showAll(2)">2</a></li>
+                <li class="page-item"><a class="page-link" href="javascript:showAll(3)">3</a></li>
+                <li class="page-item"><a class="page-link" href="javascript:showAll(4)">4</a></li>
+                <li class="page-item"><a class="page-link" href="javascript:showAll(5)">5</a></li>
+                <li class="page-item"><a class="page-link" href="javascript:showAll(6)">6</a></li>
+                <li class="page-item"><a class="page-link" href="javascript:showAll(7)">7</a></li>
+                <li class="page-item"><a class="page-link" href="javascript:showAll(8)">8</a></li>
+                <li class="page-item"><a class="page-link" href="javascript:showAll(8)">Last</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+</body>
+<script>
+
+</script>
+</html>
