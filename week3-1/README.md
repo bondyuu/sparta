@@ -25,7 +25,7 @@
     * service를 통해 controller로 들어온 요청을 수행할 수 있도록 했다.
   
   * 작성한 코드에서 빈(Bean)을 모두 찾아보세요!
-    * PostingController, PostingService, Posting, PostingRequestDto, PasswordRequestDto, PostingRepository, timestamped, Week3application
+    * PostingController, PostingService, Week3application
   
   * API 명세서
     * Method | URL | Request | Response
