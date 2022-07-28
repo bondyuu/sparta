@@ -14,7 +14,10 @@
     * DELETE : 리소스 삭제
     
   * RESTful한 API를 설계했나요? 어떤 부분이 그런가요? 어떤 부분이 그렇지 않나요?
-    * 
+    * URI규칙을 준수 했다.
+    * collection와 document의 리소스 관계를 표현했다.
+    * header를 설정했다.
+    * http 메소드를 활용했다.
 
   * 적절한 관심사 분리를 적용하였나요? (Controller, Repository, Service)
     * controller를 통해 requestmapping을 수행하도록 했다.
@@ -33,3 +36,11 @@
       POST|/api/postings/{id}|{"password":"password"}|"true"
       PUT|api/postings/{id}|{”title”:”title2”, ”writer”:”writer2”, ”password”:”password2”, ”contents”:”contents2”}|{"createdAt":"createdAt", "modifiedAt": "modifiedAt", "id": 1, "title": "title2", "writer": "writer2", "password": "password2", "contents": "contents2"}
       DELETE|api/postings/{id}||"true"
+  * Use Case 그려보기
+     * usecase 그리기가 생각보다 까다롭다..
+     * ![usecase](https://user-images.githubusercontent.com/87316155/181411467-ca7b52f9-7c29-4d80-a59d-802cdf85d960.jpg)
+
+ 
+  
+ 
+
