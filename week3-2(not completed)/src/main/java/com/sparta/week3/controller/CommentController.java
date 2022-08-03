@@ -33,28 +33,13 @@ public class CommentController {
     }
 
     @PutMapping("/api/auth/comments/{postingId}/{commentId}")
-    public Comment updateComment(@PathVariable Long postingId, @PathVariable Long commentId, @RequestBody CommentRequestDto requestDto,
-                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
-
-        Comment comment = commentRepository.findByCommentId(commentId);
-
-        if(!userDetails.getUser().getUsername().equals(comment.getUsername())) {
-            throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
-        }
+    public Comment updateComment(@PathVariable Long postingId, @PathVariable Long commentId, @RequestBody CommentRequestDto requestDto) {
 
         return commentService.updateComment(postingId, commentId,requestDto);
     }
 
     @DeleteMapping("/api/auth/comment/{postingId}/{commentId}")
-    public String deleteComment(@PathVariable Long postingId, @PathVariable Long commentId,
-                                @AuthenticationPrincipal UserDetailsImpl userDetails) {
-
-        Comment comment = commentRepository.findByCommentId(commentId);
-
-        if(!userDetails.getUser().getUsername().equals(comment.getUsername())) {
-            throw new IllegalArgumentException("작성자만 삭제할 수 있습니다.");
-        }
-
+    public String deleteComment(@PathVariable Long postingId, @PathVariable Long commentId) {
         commentService.deleteComment(postingId, commentId);
 
         return "Deleted Successfully";

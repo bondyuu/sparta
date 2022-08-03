@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.annotation.Resource;
-import java.util.Optional;
 
 public class FormLoginAuthProvider implements AuthenticationProvider {
 
@@ -31,16 +30,8 @@ public class FormLoginAuthProvider implements AuthenticationProvider {
 
         // UserDetailsService 를 통해 DB에서 username 으로 사용자 조회
         UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(username);
-
-
-
-        if (!userDetails.isEnabled()) {
-            throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
-        }
-
-
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new BadCredentialsException(userDetails.getUsername() + "비밀번호가 일치하지 않습니다.");
+            throw new BadCredentialsException(userDetails.getUsername() + "Invalid password");
         }
 
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

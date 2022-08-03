@@ -4,9 +4,7 @@
 package com.sparta.week3.controller;
 
 
-import com.sparta.week3.model.Comment;
 import com.sparta.week3.model.Posting;
-import com.sparta.week3.repository.CommentRepository;
 import com.sparta.week3.repository.PostingRepository;
 import com.sparta.week3.dto.PostingRequestDto;
 import com.sparta.week3.security.UserDetailsImpl;
@@ -23,7 +21,6 @@ public class PostingController {
 
     private final PostingRepository postingRepository;
     private final PostingService postingService;
-    private final CommentRepository commentRepository;
 
     @GetMapping("/api/postings")
     public List<Posting> getPostings() {
@@ -42,6 +39,8 @@ public class PostingController {
     public Posting createPosting(@RequestBody PostingRequestDto requestDto,
                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
+//        requestDto.addHeader("Authorization", "BEARER eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJFWFBJUkVEX0RBVEUiOjE2NTk3Nzc0NjAsImlzcyI6InNwYXJ0YSIsIlVTRVJfTkFNRSI6ImtvbyJ9.F1btAhombkbFSSROgzp9ulhgOsSF3xb9PdFWdVY9ZGY");
+
         Posting posting = new Posting(requestDto);
         posting.setWriter(userDetails.getUser().getUsername());
         posting.setPassword(userDetails.getUser().getPassword());
@@ -49,38 +48,13 @@ public class PostingController {
     }
 
     @PutMapping("/api/auth/postings/{postingId}")
-    public Posting updatePosting (@PathVariable Long postingId, @RequestBody PostingRequestDto requestDto,
-                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
-
-        //posting작성자와 login된 user 일치여부확인
-        Posting posting = postingRepository.findById(postingId).orElseThrow(
-                () -> new IllegalArgumentException("아이디를 확인해주세요."));
-
-        if(!userDetails.getUser().getUsername().equals(posting.getWriter())) {
-            throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
-        }
-
-
+    public Posting updatePosting (@PathVariable Long postingId, @RequestBody PostingRequestDto requestDto) {
         return postingService.update(postingId, requestDto);
     }
 
     @DeleteMapping("/api/auth/postings/{postingId}")
-    public String deletePosting (@PathVariable Long postingId,
-                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
-
-        //posting작성자와 login된 user 일치여부확인
-        Posting posting = postingRepository.findById(postingId).orElseThrow(
-                () -> new IllegalArgumentException("아이디를 확인해주세요."));
-
-        if(!userDetails.getUser().getUsername().equals(posting.getWriter())) {
-            throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
-        }
-
-        //postingId로 posting 삭제
+    public String deletePosting (@PathVariable Long postingId) {
         postingRepository.deleteById(postingId);
-
-        //postingId에 작성된 comment 삭제
-        commentRepository.deleteAllByPostingId(postingId);
         return "Deleted Successfully!";
     }
 }

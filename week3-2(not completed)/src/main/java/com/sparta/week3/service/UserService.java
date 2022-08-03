@@ -35,8 +35,6 @@ public class UserService {
         String password = null;
         if (requestDto.getPassword().equals(requestDto.getRepassword())) {
             password = passwordEncoder.encode(requestDto.getPassword());
-        } else {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
         UserRoleEnum role = UserRoleEnum.USER;
