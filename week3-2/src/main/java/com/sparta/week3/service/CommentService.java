@@ -28,17 +28,16 @@ public class CommentService {
 
     @Transactional
     public Comment updateComment(Long postingId, Long commentId, CommentRequestDto requestDto) {
-        Comment comment = commentRepository.findByPostingIdAndCommentId(postingId, commentId).orElseThrow(
-                () -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
+        Comment comment = commentRepository.findByCommentIdAndPostingId(commentId, postingId);
 
         comment.setComment(requestDto.getComment());
         return comment;
     }
 
-    @Transactional
+
+
     public void deleteComment(Long postingId, Long commentId) {
-        Comment comment = commentRepository.findByPostingIdAndCommentId(postingId, commentId).orElseThrow(
-                () -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
+        Comment comment = commentRepository.findByCommentIdAndPostingId(commentId, postingId);
         commentRepository.delete(comment);
 
     }

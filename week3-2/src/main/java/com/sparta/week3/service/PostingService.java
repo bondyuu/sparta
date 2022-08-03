@@ -4,6 +4,7 @@ package com.sparta.week3.service;
 
 
 import com.sparta.week3.model.Posting;
+import com.sparta.week3.repository.CommentRepository;
 import com.sparta.week3.repository.PostingRepository;
 import com.sparta.week3.dto.PostingRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PostingService {
     private final PostingRepository postingRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional // SQL 쿼리가 일어나야 함을 스프링에게 알려줌
     public Posting update(Long postingID, PostingRequestDto requestDto) {
@@ -24,6 +26,16 @@ public class PostingService {
 
         posting1.update(requestDto);
         return posting1;
+    }
+    @Transactional
+    public String deletePosting(Long postingId) {
+
+        //postingId에 맞는 게시글 삭제
+        postingRepository.deleteByPostingId(postingId);
+
+        //postingId에 작성된 comment 삭제
+        commentRepository.deleteAllByPostingId(postingId);
+        return "Deleted Successfully";
     }
 
 }

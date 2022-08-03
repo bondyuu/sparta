@@ -9,5 +9,7 @@ public interface PostingRepository extends JpaRepository<Posting, Long> {
 
     List<Posting> findAllByOrderByCreatedAtDesc();
 
+    void deleteByPostingId(Long postingId);
+
 }
 

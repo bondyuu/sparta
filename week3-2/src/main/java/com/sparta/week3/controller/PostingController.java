@@ -54,7 +54,7 @@ public class PostingController {
 
         //posting작성자와 login된 user 일치여부확인
         Posting posting = postingRepository.findById(postingId).orElseThrow(
-                () -> new IllegalArgumentException("아이디를 확인해주세요."));
+                () -> new IllegalArgumentException("게시글이 없습니다.."));
 
         if(!userDetails.getUser().getUsername().equals(posting.getWriter())) {
             throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
@@ -70,17 +70,12 @@ public class PostingController {
 
         //posting작성자와 login된 user 일치여부확인
         Posting posting = postingRepository.findById(postingId).orElseThrow(
-                () -> new IllegalArgumentException("아이디를 확인해주세요."));
+                () -> new IllegalArgumentException("게시글이 없습니다."));
 
         if(!userDetails.getUser().getUsername().equals(posting.getWriter())) {
-            throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
+            throw new IllegalArgumentException("작성자만 삭제할 수 있습니다.");
         }
 
-        //postingId로 posting 삭제
-        postingRepository.deleteById(postingId);
-
-        //postingId에 작성된 comment 삭제
-        commentRepository.deleteAllByPostingId(postingId);
-        return "Deleted Successfully!";
+        return postingService.deletePosting(postingId);
     }
 }
