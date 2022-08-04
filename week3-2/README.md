@@ -1,6 +1,8 @@
-# sparta
 
-## 3-2 주특기 숙련주차
+# 3-2 주특기 숙련주차
+
+### HTTP 요청 보낼 때, bearer에 로그인하며 받은 Token 넣어 이용해야함
+
 
 - FormLogin을 활용할 때와 활용하지 않을 때 어떤 차이점이 있었나요?
   - FormLogin을 사용할 때는 EnumUserRole을 설정해 서버 측에서 권한을 확인하고 인가를 했다면, jwt를 사용할 때는 클라이언트가 Authorization 값을 가져왔을 때 jwtAuthFilter을 통해 인가를 해줄 수 있었습니다. 
